@@ -7,15 +7,15 @@ properly target the SAE auth functionality. The reason is that `hostap/tests/fuz
 and that the `hapd` hostap data structure does not have all required fields set.
 
 ```C
-	// SAE specific hapd configuration
-	os_memcpy(hapd->sae_token_key, "\xe1\x06\x03\xab\x05\x26\x07\x08", 8);
-	os_get_reltime(&hapd->last_sae_token_key_update);
-	hapd->dot11RSNASAERetransPeriod = 10; //ms
-    dl_list_init(&hapd->sae_commit_queue);
-	
-	hapd->conf->wpa_key_mgmt = WPA_KEY_MGMT_SAE;
-	hapd->conf->wpa = WPA_PROTO_RSN;
-	hapd->conf->auth_algs = WPA_AUTH_ALG_SAE;
+// SAE specific hapd configuration
+os_memcpy(hapd->sae_token_key, "\xe1\x06\x03\xab\x05\x26\x07\x08", 8);
+os_get_reltime(&hapd->last_sae_token_key_update);
+hapd->dot11RSNASAERetransPeriod = 10; //ms
+dl_list_init(&hapd->sae_commit_queue);
+
+hapd->conf->wpa_key_mgmt = WPA_KEY_MGMT_SAE;
+hapd->conf->wpa = WPA_PROTO_RSN;
+hapd->conf->auth_algs = WPA_AUTH_ALG_SAE;
 ```    
 
 This fuzzzing test supports fuzzing all SAE functionality found in `hostap/src/common/sae.c` and 

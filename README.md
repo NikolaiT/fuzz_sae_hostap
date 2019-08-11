@@ -87,6 +87,15 @@ Now you may run the fuzzer with a command:
 ./sae sae_corpus_2 -detect_leaks=0 -max_len=1050 -print_final_stats=1
 ```
 
+If you want to check what functionality was reached during fuzzing, you can
+set hostapd debug level to 0(DEBUG):
+
+```bash
+export WPADEBUG=0
+```
+
+If you don't want to see any ouput while fuzzing, set to `export WPADEBUG=0`.
+
 ## Open issues
 
 1. Fix memory leaks that prevent fuzzing for more than 5 minutes. I honestly don't know if this is an issue 

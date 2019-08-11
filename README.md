@@ -3,7 +3,10 @@
 This fuzzing test with libFuzzer is built on the existing fuzzing test found in `hostap/tests/fuzzing/ap-mgmt`.
 
 Even though both tests use the same fuzzing target function - `ieee802_11_mgmt()` - the existing test cannot
-properly target the SAE auth functionality.
+properly target the SAE auth functionality. The reason is that `hostap/tests/fuzzing/ap-mgmt` is compiled without SAE support
+and that the `hapd` hostap data structure does not have all required fields set. 
+This fuzzzing test supports fuzzing all SAE functionality found in `hostap/src/common/sae.c` and 
+MLME logic found in `hostap/src/ap/ieee802_11.c`. 
 
 Therefore, we needed to modify the compilation process in order to provide SAE support.
 
@@ -11,7 +14,7 @@ Another problem was the SAE queuing mechanism. Each new incoming SAE auth commit
 after `i*10ms` later, where `i` is the number of pending auth commit messages. This requires a couple of fixes in the 
 hostap source code in order to make fuzzing faster.
 
-Then there is another major problem with memory leaks. There are a couple of `zalloc()'s` in `sae_set_group()` that
+Furthermore, there is another major problem with memory leaks. There are a couple of `zalloc()'s` in `sae_set_group()` that
 allocate memory without freeing. This will abort the fuzzer after a couple of minutes due to too much leaked memory.
 
 ## Patch hostap
@@ -21,7 +24,8 @@ speed. All changes are happening in `hostap/src/ieee802_11.c`:
 
 Change `eloop_register_timeout` to 
 
-```eloop_register_timeout(0, 0, auth_sae_process_commit,
+```C
+eloop_register_timeout(0, 0, auth_sae_process_commit,
 			       hapd, NULL);
 ```
                    
@@ -41,7 +45,7 @@ Then change into the directory with the fuzzing tests
 
 Then download this repository and change into the dir:
 
-`git clone fuzz_sae_hostap && cd fuzz_sae_hostap`
+`git clone https://github.com/NikolaiT/fuzz_sae_hostap && cd fuzz_sae_hostap`
 
 Change `hostap/tests/fuzzing/rules.include` to 
 
@@ -69,7 +73,6 @@ Now you may run the fuzzer with a command:
 ```
 ./sae sae_corpus_2 -detect_leaks=0 -max_len=1050 -print_final_stats=1
 ```
-
 
 ## Open issues
 
